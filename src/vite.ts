@@ -6,11 +6,26 @@ import type {
   BlogConfigInput,
   BlogRouteComponentImports,
 } from './lib/Types.ts';
-import { generateContent, generateOgImages } from './node/content.ts';
+import {
+  generateBlogConfigModule,
+  generateContent,
+  generateOgImages,
+  generatePinnedPostModule,
+  generatePostsModule,
+} from './node/content.ts';
 
 const buildSentinel = 'VOID_BLOG_CONTENT_GENERATED';
 const escapeRegExp = (value: string) =>
   value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+const virtualBlogConfigId = 'void-blog/blog-config';
+const virtualPinnedPostId = 'void-blog/pinned-post';
+const virtualPostsId = 'void-blog/posts';
+const virtualModuleIds = new Set([
+  virtualBlogConfigId,
+  virtualPinnedPostId,
+  virtualPostsId,
+]);
+const resolvedVirtualPrefix = '\0';
 
 const defaultConfigFiles = [
   'blog.config.ts',
@@ -48,6 +63,7 @@ export function voidBlog(
   const blogConfig = defineBlog(input);
   const config = toGeneratedConfig(blogConfig);
   let command: 'serve' | 'build' = 'serve';
+  let content: ReturnType<typeof generateContent> | null = null;
   let queue = Promise.resolve();
   let root = process.cwd();
 
@@ -55,18 +71,39 @@ export function voidBlog(
     `/${escapeRegExp(config.contentDir)}/.+\\.mdx$`,
   );
 
+  const syncContent = (log?: boolean) => {
+    content = generateContent({
+      config: blogConfig,
+      configImport: resolveConfigImport(root, options.configImport),
+      log,
+      root,
+      routeComponentImports: options.routes,
+    });
+
+    return content;
+  };
+
+  const getContent = () => content ?? syncContent(false);
+
+  const invalidateVirtualModules = (server: ViteDevServer) => {
+    for (const virtualModuleId of virtualModuleIds) {
+      const mod = server.moduleGraph.getModuleById(
+        `${resolvedVirtualPrefix}${virtualModuleId}`,
+      );
+
+      if (mod) {
+        server.moduleGraph.invalidateModule(mod);
+      }
+    }
+  };
+
   const runSync = (server?: ViteDevServer) => {
     queue = queue.then(async () => {
       if (command === 'build' && process.env[buildSentinel] === '1') {
         return;
       }
 
-      const { publishedPosts } = generateContent({
-        config: blogConfig,
-        configImport: resolveConfigImport(root, options.configImport),
-        root,
-        routeComponentImports: options.routes,
-      });
+      const { publishedPosts } = syncContent();
 
       if (command === 'build') {
         await generateOgImages({ config, posts: publishedPosts, root });
@@ -74,6 +111,7 @@ export function voidBlog(
       }
 
       if (server) {
+        invalidateVirtualModules(server);
         server.ws.send({ type: 'full-reload' });
       }
     });
@@ -97,13 +135,7 @@ export function voidBlog(
           : resolve(process.cwd(), userConfig.root)
         : process.cwd();
 
-      generateContent({
-        config: blogConfig,
-        configImport: resolveConfigImport(root, options.configImport),
-        log: false,
-        root,
-        routeComponentImports: options.routes,
-      });
+      syncContent(false);
     },
     configResolved(resolvedConfig) {
       command = resolvedConfig.command;
@@ -129,7 +161,38 @@ export function voidBlog(
       server.watcher.on('unlink', onChange);
     },
     enforce: 'pre',
+    load(id) {
+      if (!id.startsWith(resolvedVirtualPrefix)) {
+        return;
+      }
+
+      const virtualId = id.slice(resolvedVirtualPrefix.length);
+      const generatedContent = getContent();
+
+      if (virtualId === virtualBlogConfigId) {
+        return generateBlogConfigModule(generatedContent.config);
+      }
+
+      if (virtualId === virtualPinnedPostId) {
+        return generatePinnedPostModule({
+          config: generatedContent.config,
+          pinnedPost: generatedContent.publishedPosts.find(
+            (post) => post.pinned,
+          ),
+          root,
+        });
+      }
+
+      if (virtualId === virtualPostsId) {
+        return generatePostsModule(generatedContent.posts);
+      }
+    },
     name: 'void-blog',
+    resolveId(id) {
+      if (virtualModuleIds.has(id)) {
+        return `${resolvedVirtualPrefix}${id}`;
+      }
+    },
   };
 }
 

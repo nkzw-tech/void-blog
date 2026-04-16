@@ -31,10 +31,25 @@
       "@nkzw/source": "./src/mdx/index.ts",
       "default": "./lib/mdx/index.mjs"
     },
+    "./blog-config": {
+      "types": "./lib/generated/blog-config.d.mts",
+      "@nkzw/source": "./src/generated/blog-config.ts",
+      "default": "./lib/generated/blog-config.mjs"
+    },
     "./node": {
       "types": "./lib/node/content.d.mts",
       "@nkzw/source": "./src/node/content.ts",
       "default": "./lib/node/content.mjs"
+    },
+    "./pinned-post": {
+      "types": "./lib/generated/pinned-post.d.mts",
+      "@nkzw/source": "./src/generated/pinned-post.tsx",
+      "default": "./lib/generated/pinned-post.mjs"
+    },
+    "./posts": {
+      "types": "./lib/generated/posts.d.mts",
+      "@nkzw/source": "./src/generated/posts.ts",
+      "default": "./lib/generated/posts.mjs"
     },
     "./react": {
       "types": "./lib/react.d.mts",
@@ -61,7 +76,7 @@
     }
   },
   "scripts": {
-    "build": "vp pack -d lib --target=es2022 --copy src/styles.css --copy src/tippy.css src/index.ts src/mdx/index.ts src/node/content.ts src/react.ts src/server.ts src/vite.ts",
+    "build": "vp pack -d lib --target=es2022 --copy src/styles.css --copy src/tippy.css src/index.ts src/generated/blog-config.ts src/generated/pinned-post.tsx src/generated/posts.ts src/mdx/index.ts src/node/content.ts src/react.ts src/server.ts src/vite.ts",
     "prepack": "vp run build",
     "prepare": "vp config"
   },

@@ -5,6 +5,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
+        'generated/blog-config': 'src/generated/blog-config.ts',
+        'generated/pinned-post': 'src/generated/pinned-post.tsx',
+        'generated/posts': 'src/generated/posts.ts',
         index: 'src/index.ts',
         mdx: 'src/mdx/index.ts',
         node: 'src/node/content.ts',
@@ -70,9 +73,6 @@ export default defineConfig({
       'example/.void',
       'example/.wrangler',
       'example/dist',
-      'example/pages/posts/*.server.ts',
-      'example/pages/posts/*.tsx',
-      'example/src/posts',
       'lib',
       'vite.config.ts.timestamp-*',
     ],

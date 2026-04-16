@@ -9,7 +9,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vite-plus/test';
 import { defineBlog, toGeneratedConfig } from '../lib/config.ts';
-import { generateContent } from './content.ts';
+import {
+  generateBlogConfigModule,
+  generateContent,
+  generatePinnedPostModule,
+} from './content.ts';
 
 const createRoot = () => mkdtempSync(join(tmpdir(), 'void-blog-'));
 
@@ -70,9 +74,9 @@ This is a post with some words.
     const { publishedPosts } = generateContent({ config, log: false, root });
 
     expect(publishedPosts).toHaveLength(1);
-    expect(existsSync(join(root, 'src/posts/AllPosts.ts'))).toBe(true);
-    expect(existsSync(join(root, 'src/posts/BlogConfig.ts'))).toBe(true);
-    expect(existsSync(join(root, 'src/posts/PinnedPost.tsx'))).toBe(true);
+    expect(existsSync(join(root, 'src/posts/AllPosts.ts'))).toBe(false);
+    expect(existsSync(join(root, 'src/posts/BlogConfig.ts'))).toBe(false);
+    expect(existsSync(join(root, 'src/posts/PinnedPost.tsx'))).toBe(false);
     expect(existsSync(join(root, 'pages/posts/[slug].tsx'))).toBe(true);
     expect(existsSync(join(root, 'pages/posts/[slug].server.ts'))).toBe(true);
     expect(existsSync(join(root, 'pages/posts/hello-world.tsx'))).toBe(false);
@@ -123,22 +127,22 @@ published: true
       },
     });
 
-    generateContent({
+    const { config: generatedConfig } = generateContent({
       config,
       configImport: 'blog.config.ts',
       log: false,
       root,
     });
 
-    expect(
-      readFileSync(join(root, 'src/posts/BlogConfig.ts'), 'utf8'),
-    ).not.toContain('CustomBlock');
+    expect(generateBlogConfigModule(generatedConfig)).not.toContain(
+      'CustomBlock',
+    );
     expect(
       readFileSync(join(root, 'pages/posts/[slug].tsx'), 'utf8'),
     ).toContain("import blogConfig from '../../blog.config.ts';");
     expect(
       readFileSync(join(root, 'pages/posts/[slug].server.ts'), 'utf8'),
-    ).toContain("import blogConfig from '../../src/posts/BlogConfig.ts';");
+    ).toContain("import blogConfig from 'void-blog/blog-config';");
   });
 
   test('can generate pages that import a custom post route component', () => {
@@ -198,7 +202,11 @@ published: true
       },
     });
 
-    generateContent({ config, log: false, root });
+    const { config: generatedConfig, publishedPosts } = generateContent({
+      config,
+      log: false,
+      root,
+    });
 
     expect(existsSync(join(root, 'pages/posts/[slug].tsx'))).toBe(true);
     expect(existsSync(join(root, 'pages/posts/[slug].server.ts'))).toBe(true);
@@ -217,7 +225,11 @@ published: true
       'draft-post',
     );
     expect(
-      readFileSync(join(root, 'src/posts/PinnedPost.tsx'), 'utf8'),
+      generatePinnedPostModule({
+        config: generatedConfig,
+        pinnedPost: publishedPosts.find((post) => post.pinned),
+        root,
+      }),
     ).toContain('export default null');
   });
 

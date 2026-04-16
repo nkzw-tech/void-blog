@@ -59,45 +59,45 @@ const escapeXml = (value: string) =>
 
 const serialize = (value: unknown) => JSON.stringify(value, null, 2);
 
-function generateStaticPosts({
+const toFsImportPath = (path: string) => `/@fs${path.replaceAll('\\', '/')}`;
+
+export const generatePostsModule = (posts: ReadonlyArray<BlogPost>) =>
+  `${generatedHeader}export default ${serialize(posts)};
+`;
+
+export const generateBlogConfigModule = (config: BlogGeneratedConfig) =>
+  `${generatedHeader}import { defineBlog } from 'void-blog';
+export default defineBlog(${serialize(config)});
+`;
+
+export function generatePinnedPostModule({
   config,
-  posts,
+  pinnedPost,
   root,
 }: {
   config: BlogGeneratedConfig;
-  posts: ReadonlyArray<BlogPost>;
+  pinnedPost: BlogPost | undefined;
   root: string;
 }) {
-  const outDir = join(root, 'src', 'posts');
-  mkdirSync(outDir, { recursive: true });
+  return pinnedPost
+    ? `${generatedHeader}import content, { tableOfContents } from ${serialize(toFsImportPath(join(root, config.contentDir, `${pinnedPost.slug}.mdx`)))};
+import allPosts from 'void-blog/posts';
 
-  writeFileIfChanged(
-    join(outDir, 'AllPosts.ts'),
-    `${generatedHeader}import type { BlogPost } from 'void-blog';
+const metadata = allPosts.find((post) => post.slug === ${serialize(pinnedPost.slug)});
 
-export default ${serialize(posts)} satisfies ReadonlyArray<BlogPost>;
-`,
-  );
-
-  writeFileIfChanged(
-    join(outDir, 'BlogConfig.ts'),
-    `${generatedHeader}import { defineBlog } from 'void-blog';
-
-export default defineBlog(${serialize(config)});
-`,
-  );
+if (!metadata) {
+  throw new Error('Pinned post metadata not found.');
 }
 
-const formatMdxImport = (fromDir: string, mdxPath: string) => {
-  const importPath = toImportPath(fromDir, mdxPath);
-  const importStatement = `import content, { tableOfContents } from '${importPath}';`;
-
-  return importStatement.length <= 80
-    ? importStatement
-    : `import content, {
-  tableOfContents,
-} from '${importPath}';`;
+export default {
+  ...metadata,
+  content,
+  tableOfContents: tableOfContents ?? null,
 };
+`
+    : `${generatedHeader}export default null;
+`;
+}
 
 function generatePostPages({
   config,
@@ -114,15 +114,17 @@ function generatePostPages({
 }) {
   const routeDir = config.routeBase.replace(/^\/+/, '');
   const pagesDir = join(root, 'pages', routeDir);
-  const srcPostsDir = join(root, 'src', 'posts');
   const configPath = configImport
     ? join(root, configImport)
-    : join(srcPostsDir, 'BlogConfig.ts');
-  const serverConfigPath = join(srcPostsDir, 'BlogConfig.ts');
+    : 'void-blog/blog-config';
   const postRouteImport = routeComponentImports?.post
     ? `import BlogPostRoute from '${toImportPath(pagesDir, join(root, routeComponentImports.post))}';`
     : "import { BlogPostRoute } from 'void-blog/react';";
-  const pinnedPost = getAllPublishedPosts(posts).find((post) => post.pinned);
+  const routeAndConfigImports = routeComponentImports?.post
+    ? `import blogConfig from '${configImport ? toImportPath(pagesDir, configPath) : configPath}';
+${postRouteImport}`
+    : `${postRouteImport}
+import blogConfig from '${configImport ? toImportPath(pagesDir, configPath) : configPath}';`;
   const contentDirImportPath = toImportPath(
     pagesDir,
     join(root, config.contentDir),
@@ -139,8 +141,7 @@ function generatePostPages({
   type LazyExoticComponent,
 } from 'react';
 ${generatedHeader}import type { BlogPostContent, BlogTableOfContents } from 'void-blog';
-import blogConfig from '${toImportPath(pagesDir, configPath)}';
-${postRouteImport}
+${routeAndConfigImports}
 import type { Props } from './[slug].server.ts';
 
 type MdxModule = Readonly<{
@@ -212,13 +213,13 @@ export default function PostPage(props: Props) {
 
   writeFileIfChanged(
     join(pagesDir, '[slug].server.ts'),
-    `import {
+    `${generatedHeader}import blogConfig from 'void-blog/blog-config';
+import allPosts from 'void-blog/posts';
+import {
   createPostHead,
   createPostLoader,
   type BlogPostLoaderProps,
 } from 'void-blog/server';
-${generatedHeader}import allPosts from '${toImportPath(pagesDir, join(srcPostsDir, 'AllPosts.ts'))}';
-import blogConfig from '${toImportPath(pagesDir, serverConfigPath)}';
 
 export type Props = BlogPostLoaderProps;
 
@@ -230,31 +231,6 @@ export function getPrerenderPaths() {
 
 export const loader = createPostLoader({ posts: allPosts });
 export const head = createPostHead(blogConfig);
-`,
-  );
-
-  writeFileIfChanged(
-    join(srcPostsDir, 'PinnedPost.tsx'),
-    pinnedPost
-      ? `${generatedHeader}${formatMdxImport(srcPostsDir, join(root, config.contentDir, `${pinnedPost.slug}.mdx`))}
-import type { BlogPostWithContent } from 'void-blog';
-import allPosts from './AllPosts.ts';
-
-const metadata = allPosts.find((post) => post.slug === '${pinnedPost.slug}');
-
-if (!metadata) {
-  throw new Error('Pinned post metadata not found.');
-}
-
-export default {
-  ...metadata,
-  content,
-  tableOfContents: tableOfContents ?? null,
-} satisfies BlogPostWithContent;
-`
-      : `${generatedHeader}import type { BlogPostWithContent } from 'void-blog';
-
-export default null satisfies BlogPostWithContent | null;
 `,
   );
 }
@@ -612,7 +588,6 @@ export function generateContent({
   const posts = readPosts({ config: generatedConfig, root });
   const publishedPosts = getAllPublishedPosts(posts);
 
-  generateStaticPosts({ config: generatedConfig, posts, root });
   generatePostPages({
     config: generatedConfig,
     configImport,
@@ -633,5 +608,5 @@ export function generateContent({
     console.log(styleText('green', '✔ Generated void-blog content.'));
   }
 
-  return { posts, publishedPosts };
+  return { config: generatedConfig, posts, publishedPosts };
 }
