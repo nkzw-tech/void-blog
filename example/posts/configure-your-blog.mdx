@@ -1,0 +1,97 @@
+---
+title: Configure Your Blog
+date: 2026-04-15T00:00:00Z
+description: Define site metadata, labels, output files, and theme text.
+published: true
+category: setup
+type: reference
+tags:
+  - config
+  - metadata
+---
+
+Create `blog.config.ts` at the app root. The Vite plugin finds this file by
+convention and generated post pages import it automatically.
+
+```ts title="blog.config.ts"
+import { defineBlog } from 'void-blog';
+
+export default defineBlog({
+  categoryLabels: {
+    authoring: 'Authoring',
+    customization: 'Customization',
+    setup: 'Setup',
+  },
+  site: {
+    description: 'Concise docs for building MDX blogs on Void.',
+    footerLinks: [{ href: 'https://void.cloud', label: 'void' }],
+    language: 'en-US',
+    name: 'Void Blog Docs',
+    url: 'http://localhost:4010',
+  },
+  text: {
+    latestArticle: 'Start Here',
+    postFooter: 'Thanks for reading.',
+  },
+});
+```
+
+## Site Metadata
+
+`site.name`, `site.description`, and `site.url` are required. They drive the
+default home page, generated post metadata, feed output, sitemap output, and
+Open Graph metadata.
+
+Optional site fields:
+
+- `email`
+- `footerLinks`
+- `headerImages`
+- `language`
+- `socialImage`
+- `title`
+
+## Content Settings
+
+The default content directory is `posts`.
+
+```ts
+defineBlog({
+  contentDir: 'posts',
+  routeBase: '/posts',
+});
+```
+
+`routeBase` controls the generated URL prefix. With `/posts`, a file named
+`posts/start-a-void-blog.mdx` becomes `/posts/start-a-void-blog`.
+
+## Generated Outputs
+
+These are enabled by default:
+
+```ts
+defineBlog({
+  feed: true,
+  llmsTxt: true,
+  markdown: true,
+  sitemap: true,
+});
+```
+
+Disable an output by setting it to `false`.
+
+## Post Type Colors
+
+`postTypeColors` maps frontmatter `type` values to built-in Open Graph themes:
+
+```ts
+defineBlog({
+  postTypeColors: {
+    guide: 'emerald',
+    reference: 'light',
+  },
+});
+```
+
+Supported theme names are `blue`, `dark`, `emerald`, `fuchsia`, `light`, `pink`,
+and `purple`.

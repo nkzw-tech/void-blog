@@ -1,0 +1,53 @@
+{
+  "$schema": "../node_modules/void/schema.json",
+  "head": {
+    "title": "Void Blog Docs",
+    "htmlAttrs": {
+      "lang": "en"
+    },
+    "meta": [
+      {
+        "charset": "utf-8"
+      },
+      {
+        "name": "viewport",
+        "content": "width=device-width, initial-scale=1, shrink-to-fit=no"
+      },
+      {
+        "name": "description",
+        "content": "Concise docs for building MDX blogs on Void."
+      },
+      {
+        "property": "og:title",
+        "content": "Void Blog Docs"
+      },
+      {
+        "property": "og:description",
+        "content": "Concise docs for building MDX blogs on Void."
+      },
+      {
+        "property": "og:image",
+        "content": "http://localhost:4010/images/header.svg"
+      }
+    ],
+    "link": [
+      {
+        "rel": "icon",
+        "href": "/favicon.svg"
+      },
+      {
+        "rel": "alternate",
+        "href": "/feed.xml",
+        "type": "application/rss+xml"
+      }
+    ]
+  },
+  "routing": {
+    "headers": {
+      "/posts/*.md": ["Content-Type: text/markdown; charset=utf-8"]
+    }
+  },
+  "worker": {
+    "compatibility_date": "2025-12-17"
+  }
+}

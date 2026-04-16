@@ -1,0 +1,88 @@
+---
+title: Start a Void Blog
+date: 2026-04-16T00:00:00Z
+description: Install void-blog and wire it into a Void app.
+published: true
+pinned: true
+category: setup
+type: guide
+tags:
+  - install
+  - vite
+  - void
+---
+
+`void-blog` is a Vite plugin, MDX dialect, generated content pipeline, and React
+theme for blogs deployed with Void.
+
+<Callout>
+  This example is also the documentation site. Run{' '}
+  <code>vp run void-blog-example#dev</code>
+  from the repository root to try every file shown here.
+</Callout>
+
+## Install
+
+During the Void private preview, configure the private registry and install the
+platform dependencies:
+
+```ini title=".npmrc"
+@void-sdk:registry=https://npm.pkg.github.com
+```
+
+```sh title="terminal"
+pnpm add void-blog react react-dom
+pnpm add -D @mdx-js/rollup @tailwindcss/vite tailwindcss vite
+pnpm add -D void@npm:@void-sdk/void@0.3.1 @void/react@npm:@void-sdk/react@0.3.1
+```
+
+## Configure Vite
+
+`voidBlog()` must run before `voidPlugin()` so generated routes exist before
+Void scans the app:
+
+```ts title="vite.config.ts"
+import mdx from '@mdx-js/rollup';
+import tailwindcss from '@tailwindcss/vite';
+import { voidReact } from '@void/react/plugin';
+import { defineConfig } from 'vite-plus';
+import { voidPlugin } from 'void';
+import mdxOptions from 'void-blog/mdx';
+import { voidBlog } from 'void-blog/vite';
+import blogConfig from './blog.config.ts';
+
+export default defineConfig({
+  plugins: [
+    voidBlog(blogConfig),
+    ...voidPlugin(),
+    mdx(mdxOptions),
+    ...tailwindcss(),
+    ...voidReact({ viewTransitions: true }),
+  ],
+});
+```
+
+## Add The Layout
+
+Import the package stylesheet once in your root layout:
+
+```tsx title="pages/layout.tsx"
+import 'void-blog/styles.css';
+import type { ReactNode } from 'react';
+
+export default function Layout({ children }: { children: ReactNode }) {
+  return children;
+}
+```
+
+## Add Posts
+
+Create MDX files in `posts/`. Running `vp dev` or `vp build` generates:
+
+- `pages/posts/<slug>.tsx`
+- `pages/posts/<slug>.server.ts`
+- `src/posts/AllPosts.ts`
+- `src/posts/PinnedPost.tsx`
+- RSS, sitemap, Markdown mirrors, and `llms.txt`
+
+No manual content script is required.

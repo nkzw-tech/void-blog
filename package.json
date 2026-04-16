@@ -1,0 +1,124 @@
+{
+  "name": "void-blog",
+  "version": "0.0.0",
+  "description": "A Void-native blogging framework.",
+  "keywords": [
+    "blog",
+    "mdx",
+    "vite",
+    "void"
+  ],
+  "license": "MIT",
+  "author": "Christoph Nakazawa",
+  "files": [
+    "lib"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "./lib/styles.css",
+    "./lib/tippy.css"
+  ],
+  "main": "./lib/index.mjs",
+  "types": "./lib/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.mts",
+      "@nkzw/source": "./src/index.ts",
+      "default": "./lib/index.mjs"
+    },
+    "./mdx": {
+      "types": "./lib/mdx/index.d.mts",
+      "@nkzw/source": "./src/mdx/index.ts",
+      "default": "./lib/mdx/index.mjs"
+    },
+    "./node": {
+      "types": "./lib/node/content.d.mts",
+      "@nkzw/source": "./src/node/content.ts",
+      "default": "./lib/node/content.mjs"
+    },
+    "./react": {
+      "types": "./lib/react.d.mts",
+      "@nkzw/source": "./src/react.ts",
+      "default": "./lib/react.mjs"
+    },
+    "./server": {
+      "types": "./lib/server.d.mts",
+      "@nkzw/source": "./src/server.ts",
+      "default": "./lib/server.mjs"
+    },
+    "./styles.css": {
+      "@nkzw/source": "./src/styles.css",
+      "default": "./lib/styles.css"
+    },
+    "./tippy.css": {
+      "@nkzw/source": "./src/tippy.css",
+      "default": "./lib/tippy.css"
+    },
+    "./vite": {
+      "types": "./lib/vite.d.mts",
+      "@nkzw/source": "./src/vite.ts",
+      "default": "./lib/vite.mjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack -d lib --target=es2022 --copy src/styles.css --copy src/tippy.css src/index.ts src/mdx/index.ts src/node/content.ts src/react.ts src/server.ts src/vite.ts",
+    "prepack": "vp run build",
+    "prepare": "vp config"
+  },
+  "dependencies": {
+    "@nkzw/core": "^1.3.1",
+    "@nkzw/stack": "^2.3.2",
+    "@resvg/resvg-js": "^2.6.2",
+    "@shikijs/rehype": "^4.0.2",
+    "@shikijs/transformers": "^4.0.2",
+    "@stefanprobst/rehype-extract-toc": "^3.0.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "gray-matter": "^4.0.3",
+    "reading-time": "2.0.0-1",
+    "rehype-slug": "^6.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx-frontmatter": "^5.2.0",
+    "remark-smartypants": "^3.0.2",
+    "satori": "^0.26.0",
+    "shiki": "^4.0.2",
+    "tailwind-merge": "^3.5.0",
+    "tippy.js": "^6.3.7",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "@mdx-js/rollup": "^3.1.1",
+    "@nkzw/eslint-plugin": "^2.0.0",
+    "@nkzw/oxlint-config": "^1.0.1",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/unist": "^3.0.3",
+    "@typescript/native-preview": "7.0.0-dev.20260325.1",
+    "@void/react": "npm:@void-sdk/react@0.3.1",
+    "eslint-plugin-no-only-tests": "^3.3.0",
+    "eslint-plugin-perfectionist": "^5.8.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-error-boundary": "^6.1.1",
+    "tailwindcss": "^4.2.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
+    "void": "npm:@void-sdk/void@0.3.1"
+  },
+  "peerDependencies": {
+    "@mdx-js/rollup": "^3.1.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@void/react": ">=0.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^8.0.8",
+    "void": ">=0.3.0"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

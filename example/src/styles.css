@@ -1,0 +1,28 @@
+@import 'void-blog/styles.css';
+
+.docs-callout {
+  background: rgba(42, 117, 104, 0.08);
+  border: 1px solid rgba(42, 117, 104, 0.18);
+  border-radius: 8px;
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 28px 0;
+  padding: 16px 18px;
+}
+
+.docs-callout > p {
+  margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .docs-callout {
+    background: rgba(107, 171, 158, 0.1);
+    border-color: rgba(107, 171, 158, 0.24);
+  }
+}
+
+:root.dark .docs-callout {
+  background: rgba(107, 171, 158, 0.1);
+  border-color: rgba(107, 171, 158, 0.24);
+}

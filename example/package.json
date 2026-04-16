@@ -1,0 +1,30 @@
+{
+  "name": "void-blog-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vp build",
+    "dev": "vp dev",
+    "preview": "vp preview"
+  },
+  "dependencies": {
+    "@mdx-js/rollup": "^3.1.1",
+    "@nkzw/stack": "^2.3.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "@void/react": "npm:@void-sdk/react@0.3.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-error-boundary": "^6.1.1",
+    "tailwindcss": "^4.2.2",
+    "vite": "catalog:",
+    "void": "npm:@void-sdk/void@0.3.1",
+    "void-blog": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3",
+    "vite-plus": "catalog:"
+  }
+}

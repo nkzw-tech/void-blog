@@ -1,0 +1,136 @@
+---
+title: Write MDX Posts
+date: 2026-04-14T00:00:00Z
+description: Use frontmatter, built-in MDX components, and syntax highlighting.
+published: true
+category: authoring
+type: guide
+tags:
+  - mdx
+  - frontmatter
+---
+
+Every post is an MDX file with frontmatter.
+
+```md title="posts/write-mdx-posts.mdx"
+---
+title: Write MDX Posts
+date: 2026-04-14T00:00:00Z
+description: Use frontmatter, built-in MDX components, and syntax highlighting.
+published: true
+category: authoring
+type: guide
+---
+```
+
+Required fields:
+
+- `title`
+- `date`
+- `description`
+- `published`
+
+Useful optional fields:
+
+- `category`
+- `image`
+- `pinned`
+- `tags`
+- `type`
+- `youtube`
+
+## Built-In Components
+
+`void-blog` provides MDX components for common blog content:
+
+<Note>
+  Use <code>Note</code> for short side notes that should stay in the reading
+  flow.
+</Note>
+
+`TableOfContents` renders the headings exported by the MDX pipeline:
+
+<TableOfContents />
+
+## Code Blocks
+
+Code blocks use the package syntax highlighter. Add a title to show file names
+or commands:
+
+```tsx title="components/Example.tsx"
+export default function Example() {
+  return <strong>MDX can render React.</strong>;
+}
+```
+
+## Links
+
+Internal links are routed through Void's client router by the default Markdown
+link component, so they keep SPA navigation and view transitions.
+
+External links automatically receive safe target and rel attributes.
+
+## Custom Components
+
+Register app components in `blog.config.ts`:
+
+```ts title="blog.config.ts"
+import { defineBlog } from 'void-blog';
+import Callout from './src/components/Callout.tsx';
+
+export default defineBlog({
+  mdxComponents: {
+    Callout,
+  },
+  site: {
+    description: 'Concise docs for building MDX blogs on Void.',
+    name: 'Void Blog Docs',
+    url: 'http://localhost:4010',
+  },
+});
+```
+
+Then use them in posts:
+
+<Callout>
+  This callout is defined by the example app and registered through
+  <code>mdxComponents</code>.
+</Callout>
+
+## Replace Built-Ins
+
+Use the same `mdxComponents` field to replace built-in MDX renderers. Lowercase
+keys replace HTML elements emitted by MDX, so `pre` replaces fenced code blocks:
+
+```tsx title="src/components/CodeBlock.tsx"
+import { BlogPre } from 'void-blog/react';
+import type { ComponentProps } from 'react';
+
+export default function CodeBlock(props: ComponentProps<'pre'>) {
+  return (
+    <div className="code-frame">
+      <BlogPre {...props} />
+    </div>
+  );
+}
+```
+
+```ts title="blog.config.ts"
+import { defineBlog } from 'void-blog';
+import CodeBlock from './src/components/CodeBlock.tsx';
+
+export default defineBlog({
+  mdxComponents: {
+    pre: CodeBlock,
+  },
+  site: {
+    description: 'Concise docs for building MDX blogs on Void.',
+    name: 'Void Blog Docs',
+    url: 'http://localhost:4010',
+  },
+});
+```
+
+The package exports `BlogPre`, `BlogNote`, `BlogImage`, `BlogVideo`,
+`BlogInlineNote`, and `BlogMarkdownLink` when you want to wrap the default
+behavior instead of replacing it from scratch.

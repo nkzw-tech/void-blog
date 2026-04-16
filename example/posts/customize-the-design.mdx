@@ -1,0 +1,100 @@
+---
+title: Customize the Design
+date: 2026-04-13T00:00:00Z
+description: Use the default theme, override CSS, or replace generated routes.
+published: true
+category: customization
+type: guide
+tags:
+  - design
+  - routes
+  - css
+---
+
+The default theme is intentionally small. Start by importing it, then add your
+own CSS after it:
+
+```tsx title="pages/layout.tsx"
+import 'void-blog/styles.css';
+import '../src/site.css';
+import type { ReactNode } from 'react';
+
+export default function Layout({ children }: { children: ReactNode }) {
+  return children;
+}
+```
+
+## Change Tokens With CSS
+
+Override CSS variables for colors and code styling:
+
+```css title="src/site.css"
+:root {
+  --background-color: #fff;
+  --link-color: #2a7568;
+  --text-color: #1f2b28;
+}
+```
+
+Use ordinary CSS for layout changes. The default route classes are prefixed with
+`void-blog-`, for example `void-blog-page`, `void-blog-hero`, and
+`void-blog-post-article`.
+
+## Replace The Post Route
+
+For a full post design, provide a route component to the Vite plugin:
+
+```ts title="vite.config.ts"
+voidBlog(blogConfig, {
+  routes: {
+    post: 'src/blog/PostRoute.tsx',
+  },
+});
+```
+
+The component receives typed post props:
+
+```tsx title="src/blog/PostRoute.tsx"
+import {
+  BlogConfigProvider,
+  BlogPostBody,
+  type BlogPostRouteProps,
+} from 'void-blog/react';
+
+export default function PostRoute({
+  config,
+  content,
+  post,
+  tableOfContents,
+}: BlogPostRouteProps) {
+  if (!post) {
+    return null;
+  }
+
+  return (
+    <BlogConfigProvider config={config}>
+      <main>
+        <h1>{post.title}</h1>
+        <BlogPostBody
+          {...post}
+          content={content}
+          tableOfContents={tableOfContents}
+        />
+      </main>
+    </BlogConfigProvider>
+  );
+}
+```
+
+## Keep Client Navigation
+
+Use `Link` from `@void/react` for internal links in custom routes. Raw anchors
+perform document navigation and bypass Void's client router:
+
+```tsx
+import { Link } from '@void/react';
+
+<Link href="/posts/start-a-void-blog">Start a Void Blog</Link>;
+```
+
+This keeps prefetching and view transitions working.
