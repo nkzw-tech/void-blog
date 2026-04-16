@@ -4,7 +4,7 @@ A Void-native blogging framework for MDX blogs.
 
 `void-blog` provides:
 
-- a Vite plugin that scans `posts/*.mdx` and generates Void page files
+- a Vite plugin that scans `posts/*.mdx` and generates Void dynamic post routes
 - a configurable MDX dialect with syntax highlighting, frontmatter, inline notes, table of contents export, and smart typography
 - Void server helpers for home/post loaders and post `<head>` metadata
 - a small default React theme that can be styled or replaced

@@ -123,10 +123,11 @@ export function createPostLoader({
   slug,
 }: {
   posts: ReadonlyArray<BlogPost>;
-  slug: string;
+  slug?: string;
 }) {
   return defineHandler<BlogPostLoaderProps>((c) => {
-    const post = posts.find((candidate) => candidate.slug === slug);
+    const postSlug = slug ?? c.req.param('slug');
+    const post = posts.find((candidate) => candidate.slug === postSlug);
 
     if (!post) {
       return c.text('Not Found', 404);

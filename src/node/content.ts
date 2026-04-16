@@ -123,71 +123,115 @@ function generatePostPages({
     ? `import BlogPostRoute from '${toImportPath(pagesDir, join(root, routeComponentImports.post))}';`
     : "import { BlogPostRoute } from 'void-blog/react';";
   const pinnedPost = getAllPublishedPosts(posts).find((post) => post.pinned);
-  const expectedFiles = new Set<string>();
+  const contentDirImportPath = toImportPath(
+    pagesDir,
+    join(root, config.contentDir),
+  );
 
   mkdirSync(pagesDir, { recursive: true });
 
-  for (const { slug } of posts) {
-    expectedFiles.add(`${slug}.server.ts`);
-    expectedFiles.add(`${slug}.tsx`);
-  }
-
-  for (const file of readdirSync(pagesDir)) {
-    if (
-      expectedFiles.has(file) ||
-      file === '[slug].server.ts' ||
-      file === '[slug].tsx' ||
-      (!file.endsWith('.server.ts') && !file.endsWith('.tsx'))
-    ) {
-      continue;
-    }
-
-    const path = join(pagesDir, file);
-    const content = readFileIfExists(path);
-
-    if (content?.includes(generatedHeader.trim())) {
-      rmSync(path, { force: true });
-    }
-  }
-
-  for (const { slug } of posts) {
-    const mdxPath = join(root, config.contentDir, `${slug}.mdx`);
-
-    writeFileIfChanged(
-      join(pagesDir, `${slug}.tsx`),
-      `${generatedHeader}${formatMdxImport(pagesDir, mdxPath)}
-${postRouteImport}
+  writeFileIfChanged(
+    join(pagesDir, '[slug].tsx'),
+    `import {
+  lazy,
+  Suspense,
+  type ComponentType,
+  type LazyExoticComponent,
+} from 'react';
+${generatedHeader}import type { BlogPostContent, BlogTableOfContents } from 'void-blog';
 import blogConfig from '${toImportPath(pagesDir, configPath)}';
-import type { Props } from './${slug}.server.ts';
+${postRouteImport}
+import type { Props } from './[slug].server.ts';
+
+type MdxModule = Readonly<{
+  default: BlogPostContent;
+  tableOfContents?: BlogTableOfContents | null;
+}>;
+
+type PostRouteComponent =
+  | ComponentType<Props>
+  | LazyExoticComponent<ComponentType<Props>>;
+
+const serverPosts = import.meta.env.SSR
+  ? import.meta.glob<MdxModule>('${contentDirImportPath}/*.mdx', {
+      eager: true,
+    })
+  : ({} as Record<string, MdxModule>);
+const clientPosts = import.meta.glob<MdxModule>('${contentDirImportPath}/*.mdx');
+
+const createPostRoute = (mod: MdxModule): ComponentType<Props> =>
+  function PostRoute(props) {
+    return (
+      <BlogPostRoute
+        {...props}
+        config={blogConfig}
+        content={mod.default}
+        tableOfContents={mod.tableOfContents ?? null}
+      />
+    );
+  };
+
+const serverRoutes = Object.fromEntries(
+  Object.entries(serverPosts).map(([key, mod]) => [key, createPostRoute(mod)]),
+) as Record<string, PostRouteComponent>;
+
+const clientRoutes = Object.fromEntries(
+  Object.entries(clientPosts).map(([key, loadPost]) => [
+    key,
+    lazy(async () => {
+      const mod = await loadPost();
+
+      return { default: createPostRoute(mod) };
+    }),
+  ]),
+) as Record<string, PostRouteComponent>;
+
+const routes = import.meta.env.SSR ? serverRoutes : clientRoutes;
 
 export default function PostPage(props: Props) {
+  const { post } = props;
+
+  if (!post) {
+    return null;
+  }
+
+  const PostRoute = routes[\`${contentDirImportPath}/\${post.slug}.mdx\`];
+
+  if (!PostRoute) {
+    return null;
+  }
+
   return (
-    <BlogPostRoute
-      {...props}
-      config={blogConfig}
-      content={content}
-      tableOfContents={tableOfContents ?? null}
-    />
+    <Suspense fallback={null}>
+      <PostRoute {...props} />
+    </Suspense>
   );
 }
 `,
-    );
+  );
 
-    writeFileIfChanged(
-      join(pagesDir, `${slug}.server.ts`),
-      `${generatedHeader}import allPosts from '${toImportPath(pagesDir, join(srcPostsDir, 'AllPosts.ts'))}';
+  writeFileIfChanged(
+    join(pagesDir, '[slug].server.ts'),
+    `import {
+  createPostHead,
+  createPostLoader,
+  type BlogPostLoaderProps,
+} from 'void-blog/server';
+${generatedHeader}import allPosts from '${toImportPath(pagesDir, join(srcPostsDir, 'AllPosts.ts'))}';
 import blogConfig from '${toImportPath(pagesDir, serverConfigPath)}';
-import { createPostHead, createPostLoader, type BlogPostLoaderProps } from 'void-blog/server';
 
 export type Props = BlogPostLoaderProps;
 
 export const prerender = true;
-const slug = '${slug}';
-export const loader = createPostLoader({ posts: allPosts, slug });
+
+export function getPrerenderPaths() {
+  return allPosts.map(({ slug }) => ({ slug }));
+}
+
+export const loader = createPostLoader({ posts: allPosts });
 export const head = createPostHead(blogConfig);
 `,
-    );
-  }
+  );
 
   writeFileIfChanged(
     join(srcPostsDir, 'PinnedPost.tsx'),

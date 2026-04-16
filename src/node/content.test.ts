@@ -73,10 +73,15 @@ This is a post with some words.
     expect(existsSync(join(root, 'src/posts/AllPosts.ts'))).toBe(true);
     expect(existsSync(join(root, 'src/posts/BlogConfig.ts'))).toBe(true);
     expect(existsSync(join(root, 'src/posts/PinnedPost.tsx'))).toBe(true);
-    expect(existsSync(join(root, 'pages/posts/hello-world.tsx'))).toBe(true);
+    expect(existsSync(join(root, 'pages/posts/[slug].tsx'))).toBe(true);
+    expect(existsSync(join(root, 'pages/posts/[slug].server.ts'))).toBe(true);
+    expect(existsSync(join(root, 'pages/posts/hello-world.tsx'))).toBe(false);
     expect(existsSync(join(root, 'pages/posts/hello-world.server.ts'))).toBe(
-      true,
+      false,
     );
+    expect(
+      readFileSync(join(root, 'pages/posts/[slug].server.ts'), 'utf8'),
+    ).toContain('export function getPrerenderPaths()');
     expect(existsSync(join(root, 'public/posts/hello-world.md'))).toBe(true);
     expect(readFileSync(join(root, 'public/feed.xml'), 'utf8')).toContain(
       '<title>Example</title>',
@@ -129,10 +134,10 @@ published: true
       readFileSync(join(root, 'src/posts/BlogConfig.ts'), 'utf8'),
     ).not.toContain('CustomBlock');
     expect(
-      readFileSync(join(root, 'pages/posts/custom-mdx.tsx'), 'utf8'),
+      readFileSync(join(root, 'pages/posts/[slug].tsx'), 'utf8'),
     ).toContain("import blogConfig from '../../blog.config.ts';");
     expect(
-      readFileSync(join(root, 'pages/posts/custom-mdx.server.ts'), 'utf8'),
+      readFileSync(join(root, 'pages/posts/[slug].server.ts'), 'utf8'),
     ).toContain("import blogConfig from '../../src/posts/BlogConfig.ts';");
   });
 
@@ -173,7 +178,7 @@ published: true
     });
 
     expect(
-      readFileSync(join(root, 'pages/posts/custom-route.tsx'), 'utf8'),
+      readFileSync(join(root, 'pages/posts/[slug].tsx'), 'utf8'),
     ).toContain("import BlogPostRoute from '../../src/blog/PostRoute.tsx';");
   });
 
@@ -195,10 +200,11 @@ published: true
 
     generateContent({ config, log: false, root });
 
-    expect(existsSync(join(root, 'pages/posts/draft-post.tsx'))).toBe(true);
-    expect(existsSync(join(root, 'pages/posts/draft-post.server.ts'))).toBe(
-      true,
-    );
+    expect(existsSync(join(root, 'pages/posts/[slug].tsx'))).toBe(true);
+    expect(existsSync(join(root, 'pages/posts/[slug].server.ts'))).toBe(true);
+    expect(
+      readFileSync(join(root, 'pages/posts/[slug].server.ts'), 'utf8'),
+    ).toContain('allPosts.map(({ slug }) => ({ slug }))');
     expect(existsSync(join(root, 'public/posts/published-post.md'))).toBe(true);
     expect(existsSync(join(root, 'public/posts/draft-post.md'))).toBe(false);
     expect(readFileSync(join(root, 'public/feed.xml'), 'utf8')).not.toContain(
@@ -233,8 +239,10 @@ published: true
 
     generateContent({ config, log: false, root });
 
-    expect(existsSync(join(root, 'pages/root-post.tsx'))).toBe(true);
-    expect(existsSync(join(root, 'pages/root-post.server.ts'))).toBe(true);
+    expect(existsSync(join(root, 'pages/[slug].tsx'))).toBe(true);
+    expect(existsSync(join(root, 'pages/[slug].server.ts'))).toBe(true);
+    expect(existsSync(join(root, 'pages/root-post.tsx'))).toBe(false);
+    expect(existsSync(join(root, 'pages/root-post.server.ts'))).toBe(false);
     expect(existsSync(join(root, 'pages/posts/root-post.tsx'))).toBe(false);
   });
 
