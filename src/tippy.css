@@ -3,14 +3,14 @@
 
 .tippy-box[data-theme~='light-border'] {
   background-clip: padding-box;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: var(--background-color, #fff);
+  color: var(--text-color, #111);
   border-radius: 24px;
   corner-shape: squircle;
   @apply border border-gray-200 p-1 text-base shadow-lg dark:border-gray-600;
 }
 .tippy-box[data-theme~='light-border'] > .tippy-backdrop {
-  background-color: var(--background-color);
+  background-color: var(--background-color, #fff);
 }
 .tippy-box[data-theme~='light-border'] > .tippy-arrow:after,
 .tippy-box[data-theme~='light-border'] > .tippy-svg-arrow:after {
@@ -24,7 +24,7 @@
 }
 .tippy-box[data-theme~='light-border'][data-placement^='top']
   > .tippy-arrow:before {
-  border-top-color: var(--background-color);
+  border-top-color: var(--background-color, #fff);
 }
 .tippy-box[data-theme~='light-border'][data-placement^='top']
   > .tippy-arrow:after {
@@ -44,7 +44,7 @@
 }
 .tippy-box[data-theme~='light-border'][data-placement^='bottom']
   > .tippy-arrow:before {
-  border-bottom-color: var(--background-color);
+  border-bottom-color: var(--background-color, #fff);
   bottom: 16px;
 }
 .tippy-box[data-theme~='light-border'][data-placement^='bottom']
@@ -65,7 +65,7 @@
 }
 .tippy-box[data-theme~='light-border'][data-placement^='left']
   > .tippy-arrow:before {
-  border-left-color: var(--background-color);
+  border-left-color: var(--background-color, #fff);
 }
 .tippy-box[data-theme~='light-border'][data-placement^='left']
   > .tippy-arrow:after {
@@ -85,15 +85,15 @@
 }
 .tippy-box[data-theme~='light-border'][data-placement^='right']
   > .tippy-arrow:before {
-  @apply border-r-gray-200 dark:border-r-gray-600;
+  border-right-color: var(--background-color, #fff);
   right: 16px;
 }
 .tippy-box[data-theme~='light-border'][data-placement^='right']
   > .tippy-arrow:after {
+  @apply border-r-gray-200 dark:border-r-gray-600;
   border-width: 7px 7px 7px 0;
   right: 17px;
   top: 1px;
-  border-right-color: var(--text-color);
 }
 .tippy-box[data-theme~='light-border'][data-placement^='right']
   > .tippy-svg-arrow
@@ -105,7 +105,7 @@
   right: 12px;
 }
 .tippy-box[data-theme~='light-border'] > .tippy-svg-arrow {
-  fill: var(--background-color);
+  fill: var(--background-color, #fff);
 }
 .tippy-box[data-theme~='light-border'] > .tippy-svg-arrow:after {
   background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCA2czEuNzk2LS4wMTMgNC42Ny0zLjYxNUM1Ljg1MS45IDYuOTMuMDA2IDggMGMxLjA3LS4wMDYgMi4xNDguODg3IDMuMzQzIDIuMzg1QzE0LjIzMyA2LjAwNSAxNiA2IDE2IDZIMHoiIGZpbGw9InJnYmEoMCwgOCwgMTYsIDAuMikiLz48L3N2Zz4=);
