@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
+import { styleText } from 'node:util';
 import type { Plugin, ViteDevServer } from 'vite';
 import { defineBlog, toGeneratedConfig } from './lib/config.ts';
 import type {
@@ -14,7 +16,6 @@ import {
   generatePostsModule,
 } from './node/content.ts';
 
-const buildSentinel = 'VOID_BLOG_CONTENT_GENERATED';
 const escapeRegExp = (value: string) =>
   value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 const virtualBlogConfigId = 'void-blog/blog-config';
@@ -26,6 +27,9 @@ const virtualModuleIds = new Set([
   virtualPostsId,
 ]);
 const resolvedVirtualPrefix = '\0';
+const logGeneratedContent = () => {
+  console.log(styleText('green', '✔ Generated void-blog content.'));
+};
 
 const defaultConfigFiles = [
   'blog.config.ts',
@@ -64,12 +68,17 @@ export function voidBlog(
   const config = toGeneratedConfig(blogConfig);
   let command: 'serve' | 'build' = 'serve';
   let content: ReturnType<typeof generateContent> | null = null;
+  let contentRoot: string | null = null;
   let queue = Promise.resolve();
   let root = process.cwd();
 
   const postFilePattern = new RegExp(
     `/${escapeRegExp(config.contentDir)}/.+\\.mdx$`,
   );
+  const getBuildKey = () =>
+    `${root}\0${config.contentDir}\0${config.routeBase}`;
+  const getBuildSentinel = () =>
+    `VOID_BLOG_CONTENT_GENERATED_${createHash('sha1').update(getBuildKey()).digest('hex')}`;
 
   const syncContent = (log?: boolean) => {
     content = generateContent({
@@ -79,11 +88,13 @@ export function voidBlog(
       root,
       routeComponentImports: options.routes,
     });
+    contentRoot = root;
 
     return content;
   };
 
-  const getContent = () => content ?? syncContent(false);
+  const getContent = () =>
+    content && contentRoot === root ? content : syncContent(false);
 
   const invalidateVirtualModules = (server: ViteDevServer) => {
     for (const virtualModuleId of virtualModuleIds) {
@@ -99,14 +110,32 @@ export function voidBlog(
 
   const runSync = (server?: ViteDevServer) => {
     queue = queue.then(async () => {
+      const buildSentinel = getBuildSentinel();
+
       if (command === 'build' && process.env[buildSentinel] === '1') {
         return;
       }
 
-      const { publishedPosts } = syncContent();
+      let shouldReuseContent = false;
+      let generatedContent: ReturnType<typeof generateContent>;
+
+      if (command === 'build' && content && contentRoot === root) {
+        generatedContent = content;
+        shouldReuseContent = true;
+      } else {
+        generatedContent = syncContent();
+      }
 
       if (command === 'build') {
-        await generateOgImages({ config, posts: publishedPosts, root });
+        if (shouldReuseContent) {
+          logGeneratedContent();
+        }
+
+        await generateOgImages({
+          config,
+          posts: generatedContent.publishedPosts,
+          root,
+        });
         process.env[buildSentinel] = '1';
       }
 
@@ -139,6 +168,10 @@ export function voidBlog(
     },
     configResolved(resolvedConfig) {
       command = resolvedConfig.command;
+      if (root !== resolvedConfig.root) {
+        content = null;
+        contentRoot = null;
+      }
       root = resolvedConfig.root;
     },
     configureServer(server) {
@@ -167,6 +200,11 @@ export function voidBlog(
       }
 
       const virtualId = id.slice(resolvedVirtualPrefix.length);
+
+      if (!virtualModuleIds.has(virtualId)) {
+        return;
+      }
+
       const generatedContent = getContent();
 
       if (virtualId === virtualBlogConfigId) {

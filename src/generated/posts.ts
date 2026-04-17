@@ -1,3 +1,9 @@
 import type { BlogPost } from '../lib/Types.ts';
 
-export default [] satisfies ReadonlyArray<BlogPost>;
+const getPosts = (): ReadonlyArray<BlogPost> => {
+  throw new Error(
+    '`void-blog/posts` is a virtual module. Add `voidBlog()` from `void-blog/vite` to your Vite config.',
+  );
+};
+
+export default getPosts();

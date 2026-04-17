@@ -59,7 +59,11 @@ const escapeXml = (value: string) =>
 
 const serialize = (value: unknown) => JSON.stringify(value, null, 2);
 
-const toFsImportPath = (path: string) => `/@fs${path.replaceAll('\\', '/')}`;
+const toFsImportPath = (path: string) => {
+  const normalizedPath = path.replaceAll('\\', '/');
+
+  return `/@fs${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
+};
 
 export const generatePostsModule = (posts: ReadonlyArray<BlogPost>) =>
   `${generatedHeader}export default ${serialize(posts)};
@@ -584,6 +588,12 @@ export function generateContent({
   root,
   routeComponentImports,
 }: BlogGenerateContentOptions) {
+  if (!configImport && config.mdxComponents) {
+    throw new Error(
+      'Blog configs with `mdxComponents` must be importable. Move the config to `blog.config.ts` or pass `configImport` to `voidBlog()`.',
+    );
+  }
+
   const generatedConfig = toGeneratedConfig(config);
   const posts = readPosts({ config: generatedConfig, root });
   const publishedPosts = getAllPublishedPosts(posts);

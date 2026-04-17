@@ -1,9 +1,9 @@
-import { defineBlog } from '../lib/config.ts';
+import type { BlogConfig } from '../lib/Types.ts';
 
-export default defineBlog({
-  site: {
-    description: '',
-    name: '',
-    url: '',
-  },
-});
+const getBlogConfig = (): BlogConfig => {
+  throw new Error(
+    '`void-blog/blog-config` is a virtual module. Add `voidBlog()` from `void-blog/vite` to your Vite config.',
+  );
+};
+
+export default getBlogConfig();

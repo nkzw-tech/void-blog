@@ -145,6 +145,29 @@ published: true
     ).toContain("import blogConfig from 'void-blog/blog-config';");
   });
 
+  test('rejects non-importable configs with MDX components', () => {
+    const root = createRoot();
+    mkdirSync(join(root, 'posts'));
+    mkdirSync(join(root, 'pages'), { recursive: true });
+    mkdirSync(join(root, 'public'), { recursive: true });
+    writePost(root, 'custom-mdx', 'published: true');
+
+    const config = defineBlog({
+      mdxComponents: {
+        CustomBlock: () => null,
+      },
+      site: {
+        description: 'A blog.',
+        name: 'Example',
+        url: 'https://example.com',
+      },
+    });
+
+    expect(() => generateContent({ config, log: false, root })).toThrow(
+      'must be importable',
+    );
+  });
+
   test('can generate pages that import a custom post route component', () => {
     const root = createRoot();
     mkdirSync(join(root, 'posts'));

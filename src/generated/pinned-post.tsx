@@ -1,3 +1,9 @@
 import type { BlogPostWithContent } from '../lib/Types.ts';
 
-export default null satisfies BlogPostWithContent | null;
+const getPinnedPost = (): BlogPostWithContent | null => {
+  throw new Error(
+    '`void-blog/pinned-post` is a virtual module. Add `voidBlog()` from `void-blog/vite` to your Vite config.',
+  );
+};
+
+export default getPinnedPost();
