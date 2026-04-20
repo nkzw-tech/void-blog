@@ -9,7 +9,7 @@ import {
 
 export type Props = BlogPostLoaderProps;
 
-export const prerender = true;
+export const revalidate = 0;
 
 export function getPrerenderPaths() {
   return allPosts.map(({ slug }) => ({ slug }));
