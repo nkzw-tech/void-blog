@@ -88,10 +88,10 @@ This is a post with some words.
     ).toContain('export function getPrerenderPaths()');
     expect(
       readFileSync(join(root, 'pages/posts/[slug].server.ts'), 'utf8'),
-    ).toContain('export const revalidate = 0;');
+    ).toContain('export const prerender = true;');
     expect(
       readFileSync(join(root, 'pages/posts/[slug].server.ts'), 'utf8'),
-    ).not.toContain('export const prerender = true;');
+    ).not.toContain('export const revalidate = 0;');
     expect(existsSync(join(root, 'public/posts/hello-world.md'))).toBe(true);
     expect(readFileSync(join(root, 'public/feed.xml'), 'utf8')).toContain(
       '<title>Example</title>',
