@@ -8,7 +8,7 @@ A Void-native blogging framework for MDX blogs.
 - a configurable MDX dialect with syntax highlighting, frontmatter, inline notes, table of contents export, and smart typography
 - Void server helpers for home/post loaders and post `<head>` metadata
 - a small default React theme that can be styled or replaced
-- RSS, sitemap, Markdown mirrors, `llms.txt`, and Open Graph image generation
+- RSS, sitemap, Markdown mirrors, and Open Graph image generation
 
 ## Install
 

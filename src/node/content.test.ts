@@ -37,7 +37,7 @@ ${body}
   );
 
 describe('generateContent', () => {
-  test('generates metadata, pages, markdown, feed, sitemap, and llms files', () => {
+  test('generates metadata, pages, markdown, feed, and sitemap files', () => {
     const root = createRoot();
     mkdirSync(join(root, 'posts'));
     mkdirSync(join(root, 'pages'), { recursive: true });
@@ -98,9 +98,6 @@ This is a post with some words.
     );
     expect(readFileSync(join(root, 'public/sitemap.xml'), 'utf8')).toContain(
       'https://example.com/posts/hello-world',
-    );
-    expect(readFileSync(join(root, 'public/llms.txt'), 'utf8')).toContain(
-      '[Hello World](https://example.com/posts/hello-world.md)',
     );
   });
 
@@ -250,9 +247,6 @@ published: true
     expect(
       readFileSync(join(root, 'public/sitemap.xml'), 'utf8'),
     ).not.toContain('draft-post');
-    expect(readFileSync(join(root, 'public/llms.txt'), 'utf8')).not.toContain(
-      'draft-post',
-    );
     expect(
       generatePinnedPostModule({
         config: generatedConfig,
@@ -287,7 +281,7 @@ published: true
     expect(existsSync(join(root, 'pages/posts/root-post.tsx'))).toBe(false);
   });
 
-  test('omits markdown URLs and removes markdown mirrors when disabled', () => {
+  test('removes markdown mirrors when disabled', () => {
     const root = createRoot();
     mkdirSync(join(root, 'posts'));
     mkdirSync(join(root, 'pages'), { recursive: true });
@@ -319,13 +313,6 @@ published: true
       root,
     });
 
-    const llms = readFileSync(join(root, 'public/llms.txt'), 'utf8');
-
     expect(existsSync(join(root, 'public/posts/hello-world.md'))).toBe(false);
-    expect(llms).not.toContain('Markdown Posts');
-    expect(llms).not.toContain('hello-world.md');
-    expect(llms).toContain(
-      '[hello-world](https://example.com/posts/hello-world)',
-    );
   });
 });

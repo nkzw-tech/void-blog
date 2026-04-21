@@ -395,49 +395,6 @@ ${urls
   writeFileIfChanged(join(root, 'public/sitemap.xml'), sitemap);
 }
 
-function generateLlmsTxt({
-  config,
-  posts,
-  root,
-}: {
-  config: BlogGeneratedConfig;
-  posts: ReadonlyArray<BlogPost>;
-  root: string;
-}) {
-  if (!config.llmsTxt) {
-    return;
-  }
-
-  const llms = `# ${config.site.name}
-
-> ${config.site.description}
-
-${
-  config.markdown
-    ? `## Markdown Posts
-${posts
-  .map(
-    ({ slug, title }) =>
-      `- [${title}](${config.site.url}${config.routeBase}/${slug}.md)`,
-  )
-  .join('\n')}
-
-`
-    : ''
-}## HTML Posts
-${posts
-  .map(
-    ({ slug, title }) =>
-      `- [${title}](${config.site.url}${config.routeBase}/${slug})`,
-  )
-  .join('\n')}
-`;
-
-  writeFileIfChanged(join(root, 'public/llms.txt'), llms);
-  mkdirSync(join(root, 'public/.well-known'), { recursive: true });
-  writeFileIfChanged(join(root, 'public/.well-known/llms.txt'), llms);
-}
-
 export async function generateOgImages({
   config,
   posts,
@@ -612,7 +569,6 @@ export function generateContent({
   });
   generateFeed({ config: generatedConfig, posts: publishedPosts, root });
   generateSitemap({ config: generatedConfig, posts: publishedPosts, root });
-  generateLlmsTxt({ config: generatedConfig, posts: publishedPosts, root });
 
   if (log !== false) {
     console.log(styleText('green', '✔ Generated void-blog content.'));

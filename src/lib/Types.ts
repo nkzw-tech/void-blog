@@ -30,7 +30,6 @@ export type BlogGeneratedConfig = Readonly<{
   categoryLabels: Readonly<Record<string, string>>;
   contentDir: string;
   feed: boolean;
-  llmsTxt: boolean;
   markdown: boolean;
   ogImage: boolean;
   postTypeColors: Readonly<Record<string, BlogOGImageTheme>>;
