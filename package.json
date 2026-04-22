@@ -1,6 +1,6 @@
 {
   "name": "void-blog",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A Void-native blogging framework.",
   "keywords": [
     "blog",
@@ -75,6 +75,10 @@
       "default": "./lib/vite.mjs"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "vp pack -d lib --target=es2022 --copy src/styles.css --copy src/tippy.css src/index.ts src/generated/blog-config.ts src/generated/pinned-post.tsx src/generated/posts.ts src/mdx/index.ts src/node/content.ts src/react.ts src/server.ts src/vite.ts",
     "prepack": "vp run build",
@@ -129,11 +133,11 @@
   "peerDependencies": {
     "@mdx-js/rollup": "^3.1.0",
     "@tailwindcss/vite": "^4.0.0",
-    "@void/react": ">=0.3.0",
+    "@void/react": ">=0.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vite": "^8.0.8",
-    "void": ">=0.3.0"
+    "void": ">=0.5.0"
   },
   "packageManager": "pnpm@10.33.0"
 }

@@ -12,7 +12,8 @@ A Void-native blogging framework for MDX blogs.
 
 ## Install
 
-During the Void private preview, keep using the Void package aliases and registry setup:
+Install `void-blog` from npmjs and continue installing the Void peers through the
+private aliases:
 
 ```ini
 # .npmrc
@@ -20,7 +21,7 @@ During the Void private preview, keep using the Void package aliases and registr
 ```
 
 ```sh
-pnpm add void-blog
+pnpm add void-blog @void/react@npm:@void-sdk/react@0.5.0 void@npm:@void-sdk/void@0.5.0
 ```
 
 ## Configure
