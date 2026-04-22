@@ -10,14 +10,14 @@
   "dependencies": {
     "@mdx-js/rollup": "^3.1.1",
     "@nkzw/stack": "^2.3.2",
-    "@tailwindcss/vite": "^4.2.2",
-    "@void/react": "npm:@void-sdk/react@0.4.0",
+    "@tailwindcss/vite": "^4.2.4",
+    "@void/react": "npm:@void-sdk/react@0.5.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-error-boundary": "^6.1.1",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^4.2.4",
     "vite": "catalog:",
-    "void": "npm:@void-sdk/void@0.4.0",
+    "void": "npm:@void-sdk/void@0.5.0",
     "void-blog": "workspace:*"
   },
   "devDependencies": {

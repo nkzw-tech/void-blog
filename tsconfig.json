@@ -17,8 +17,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "types": ["vite/client", "mdx", "void/env"]
+    "types": ["vite/client", "void/env"]
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"]
 }
