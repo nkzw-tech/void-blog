@@ -12,16 +12,10 @@ A Void-native blogging framework for MDX blogs.
 
 ## Install
 
-Install `void-blog` from npmjs and continue installing the Void peers through the
-private aliases:
-
-```ini
-# .npmrc
-@void-sdk:registry=https://npm.pkg.github.com
-```
+Install `void-blog` and the Void peers from npm:
 
 ```sh
-pnpm add void-blog @void/react@npm:@void-sdk/react@0.7.0 void@npm:@void-sdk/void@0.7.0
+pnpm add void-blog @void/react@^0.7.1 void@^0.7.1
 ```
 
 ## Configure

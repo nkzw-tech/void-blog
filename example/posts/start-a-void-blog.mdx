@@ -23,17 +23,11 @@ theme for blogs deployed with Void.
 
 ## Install
 
-During the Void private preview, configure the private registry and install the
-platform dependencies:
-
-```ini title=".npmrc"
-@void-sdk:registry=https://npm.pkg.github.com
-```
+Install `void-blog`, the Void peers, and the app dependencies from npm:
 
 ```sh title="terminal"
-pnpm add void-blog react react-dom
+pnpm add void-blog @void/react@^0.7.1 void@^0.7.1 react react-dom
 pnpm add -D @mdx-js/rollup @tailwindcss/vite tailwindcss vite
-pnpm add -D void@npm:@void-sdk/void@0.3.1 @void/react@npm:@void-sdk/react@0.3.1
 ```
 
 ## Configure Vite
