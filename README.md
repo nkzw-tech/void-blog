@@ -21,7 +21,7 @@ private aliases:
 ```
 
 ```sh
-pnpm add void-blog @void/react@npm:@void-sdk/react@0.5.0 void@npm:@void-sdk/void@0.5.0
+pnpm add void-blog @void/react@npm:@void-sdk/react@0.7.0 void@npm:@void-sdk/void@0.7.0
 ```
 
 ## Configure
