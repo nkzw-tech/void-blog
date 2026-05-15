@@ -1,4 +1,4 @@
-import { defineHandler, defineHead, defineMiddleware } from 'void';
+import { defineHandler, defineHead, defineMiddleware } from 'void/handler';
 import getOGImage from './lib/getOGImage.ts';
 import type { BlogGeneratedConfig, BlogPost } from './lib/Types.ts';
 
@@ -21,6 +21,9 @@ export interface BlogHomeLoaderProps {
   pinnedPost: BlogPost | null;
   posts: ReadonlyArray<BlogPost>;
 }
+
+type BlogPostHead = ReturnType<typeof defineHead<Partial<BlogPostLoaderProps>>>;
+type BlogPreviewHead = ReturnType<typeof defineHead>;
 
 export const getAllPublishedPosts = (posts: ReadonlyArray<BlogPost>) =>
   posts.filter(({ published }) => published);
@@ -140,7 +143,7 @@ export function createPostLoader({
   });
 }
 
-export function createPostHead(config: BlogGeneratedConfig) {
+export function createPostHead(config: BlogGeneratedConfig): BlogPostHead {
   return defineHead<Partial<BlogPostLoaderProps>>((c, props) => {
     const post = props.post;
 
@@ -192,7 +195,9 @@ export function createPostHead(config: BlogGeneratedConfig) {
   });
 }
 
-export function createPreviewHead(config: BlogGeneratedConfig) {
+export function createPreviewHead(
+  config: BlogGeneratedConfig,
+): BlogPreviewHead {
   return defineHead(() => ({
     htmlAttrs: { class: 'dark' },
     title: `Preview | ${config.site.title ?? config.site.name}`,

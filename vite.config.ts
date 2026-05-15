@@ -40,7 +40,7 @@ export default defineConfig({
         'tippy.js',
         'unist-util-visit',
         'vite',
-        'void',
+        /^void($|\/)/,
       ],
     },
   },
