@@ -29,7 +29,7 @@ export default function Pre({ children, ...props }: ComponentProps<'pre'>) {
     <pre {...props}>
       {children}
       <div
-        className="void-blog-pressable absolute top-1 right-1 cursor-pointer select-none"
+        className="void-blog-copy-button void-blog-pressable"
         onClick={async (event) => {
           setCopied(false);
 

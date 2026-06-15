@@ -675,6 +675,15 @@ pre code span.line.highlighted {
   transform: scale(0.98);
 }
 
+.void-blog-copy-button {
+  cursor: pointer;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  user-select: none;
+  z-index: 1;
+}
+
 @media (prefers-color-scheme: dark) {
   .void-blog-hero {
     background-image:
