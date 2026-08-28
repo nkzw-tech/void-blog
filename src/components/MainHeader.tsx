@@ -13,7 +13,7 @@ const supportsWebP = () => {
   const element = document.createElement('canvas');
   return (hasWebPSupport =
     element.getContext && element.getContext('2d')
-      ? element.toDataURL('image/webp').indexOf('data:image/webp') == 0
+      ? element.toDataURL('image/webp').indexOf('data:image/webp') === 0
       : false);
 };
 
