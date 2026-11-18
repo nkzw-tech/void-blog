@@ -1,6 +1,5 @@
 {
   "name": "Licht",
-  "type": "css",
   "colors": {
     "editor.background": "#fffefc",
     "editor.findMatchBackground": "#ffe792",

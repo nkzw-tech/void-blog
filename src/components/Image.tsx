@@ -8,7 +8,12 @@ type Props = DetailedHTMLProps<
   hasVariants?: boolean;
 };
 
-export default function Image({ className, hasVariants, ...props }: Props) {
+export default function Image({
+  alt = '',
+  className,
+  hasVariants,
+  ...props
+}: Props) {
   if (!props.src) {
     return null;
   }
@@ -17,6 +22,7 @@ export default function Image({ className, hasVariants, ...props }: Props) {
   const extension = parts.pop();
   const image = (
     <img
+      alt={alt}
       className={cx('rounded-[32px] [corner-shape:squircle]', className)}
       loading="lazy"
       {...props}

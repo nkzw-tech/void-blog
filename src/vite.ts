@@ -60,6 +60,18 @@ const resolveConfigImport = (
   return defaultConfigFiles.find((file) => existsSync(join(root, file)));
 };
 
+const invalidateVirtualModules = (server: ViteDevServer) => {
+  for (const virtualModuleId of virtualModuleIds) {
+    const mod = server.moduleGraph.getModuleById(
+      `${resolvedVirtualPrefix}${virtualModuleId}`,
+    );
+
+    if (mod) {
+      server.moduleGraph.invalidateModule(mod);
+    }
+  }
+};
+
 export function voidBlog(
   input: BlogConfigInput,
   options: VoidBlogPluginOptions = {},
@@ -95,18 +107,6 @@ export function voidBlog(
 
   const getContent = () =>
     content && contentRoot === root ? content : syncContent(false);
-
-  const invalidateVirtualModules = (server: ViteDevServer) => {
-    for (const virtualModuleId of virtualModuleIds) {
-      const mod = server.moduleGraph.getModuleById(
-        `${resolvedVirtualPrefix}${virtualModuleId}`,
-      );
-
-      if (mod) {
-        server.moduleGraph.invalidateModule(mod);
-      }
-    }
-  };
 
   const runSync = (server?: ViteDevServer) => {
     queue = queue.then(async () => {

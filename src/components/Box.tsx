@@ -15,18 +15,21 @@ export default function Box({
   href?: string;
   ref?: RefObject<HTMLElement | null>;
 }) {
-  const as = href ? 'a' : 'div';
+  const element = href
+    ? {
+        as: 'a' as const,
+        href,
+        ref: ref as RefObject<HTMLAnchorElement | null>,
+      }
+    : { as: 'div' as const, ref: ref as RefObject<HTMLDivElement | null> };
   return (
     <VStack
-      as={as}
+      {...element}
       className={cx(
         'box overflow-hidden rounded-[32px] border p-4 text-ellipsis shadow-md backdrop-blur-xl transition-shadow duration-250 [corner-shape:squircle] hover:shadow-lg',
         className,
       )}
       gap={gap}
-      // @ts-expect-error
-      href={href}
-      ref={ref as RefObject<HTMLAnchorElement | null>}
     >
       {children}
     </VStack>

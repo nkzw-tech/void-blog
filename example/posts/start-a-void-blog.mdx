@@ -26,7 +26,7 @@ theme for blogs deployed with Void.
 Install `void-blog`, the Void peers, and the app dependencies from npm:
 
 ```sh title="terminal"
-pnpm add void-blog @void/react@^0.7.1 void@^0.7.1 react react-dom
+pnpm add void-blog @void/react@^1.10.0 void@^1.10.0 react react-dom
 pnpm add -D @mdx-js/rollup @tailwindcss/vite tailwindcss vite
 ```
 
@@ -48,10 +48,10 @@ import blogConfig from './blog.config.ts';
 export default defineConfig({
   plugins: [
     voidBlog(blogConfig),
-    ...voidPlugin(),
+    voidPlugin(),
     mdx(mdxOptions),
     ...tailwindcss(),
-    ...voidReact({ viewTransitions: true }),
+    voidReact({ viewTransitions: true }),
   ],
 });
 ```

@@ -26,10 +26,10 @@ export default defineConfig({
   },
   plugins: [
     voidBlog(blogConfig),
-    ...voidPlugin(),
+    voidPlugin(),
     mdx(mdxOptions),
     ...tailwindcss(),
-    ...voidReact({
+    voidReact({
       prefetch: { hoverDelay: 150 },
       viewTransitions: true,
     }),

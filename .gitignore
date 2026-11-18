@@ -3,7 +3,9 @@
 /lib
 /node_modules
 /.void
+/example/.cloudflare
 /example/.void
+/example/.void-wrangler.jsonc
 /example/.wrangler
 /example/dist
 /example/node_modules

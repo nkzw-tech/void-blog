@@ -28,42 +28,32 @@ export default function Pre({ children, ...props }: ComponentProps<'pre'>) {
   return (
     <pre {...props}>
       {children}
-      <div
+      <button
+        aria-label="Copy to Clipboard"
         className="void-blog-copy-button void-blog-pressable"
         onClick={async (event) => {
           setCopied(false);
 
-          let hasClipboardPermissions = null;
-          try {
-            hasClipboardPermissions = await navigator.permissions?.query({
-              // @ts-expect-error
-              name: 'clipboard-write',
-            });
-          } catch {
-            /* empty */
-          }
+          const code = Array.from(
+            event.currentTarget.parentElement?.querySelectorAll<HTMLElement>(
+              'code > span.line',
+            ) ?? [],
+            (line) => line.textContent,
+          )
+            .join('\n')
+            .replaceAll(/\n\s\n/g, '\n\n');
 
-          if (
-            hasClipboardPermissions?.state === 'granted' ||
-            hasClipboardPermissions?.state === 'prompt'
-          ) {
-            const element = event.target as HTMLElement;
-            const code = Array.from(
-              element.parentNode?.parentNode?.querySelectorAll<HTMLDivElement>(
-                'code > span.line',
-              ) || [],
-            )
-              .map((element) => element?.textContent || element?.innerText)
-              .join('\n')
-              .replaceAll(/\n\s\n/g, '\n\n');
-
-            if (code) {
-              navigator?.clipboard.writeText(code);
+          if (code && navigator.clipboard) {
+            try {
+              await navigator.clipboard.writeText(code);
               setCopied(true);
+            } catch {
+              // Clipboard access can be denied by the browser.
             }
           }
         }}
         ref={setRef}
+        type="button"
       >
         <svg
           fill="none"
@@ -89,7 +79,7 @@ export default function Pre({ children, ...props }: ComponentProps<'pre'>) {
             </>
           )}
         </svg>
-      </div>
+      </button>
     </pre>
   );
 }

@@ -2,7 +2,7 @@ import type { Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 
 type AnyNode = {
-  attributes?: Array<Record<string, unknown>>;
+  attributes?: Array<{ name: string; type: 'mdxJsxAttribute'; value: number }>;
   children?: Array<AnyNode>;
   name?: string;
   type: string;

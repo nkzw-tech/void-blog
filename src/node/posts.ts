@@ -4,14 +4,8 @@ import { basename, join } from 'node:path';
 import parseInteger from '@nkzw/core/parseInteger.js';
 import { compareDesc, parseISO } from 'date-fns';
 import matter from 'gray-matter';
-import _readingTime from 'reading-time';
+import { countWords, readingTimeWithCount } from 'reading-time';
 import type { BlogGeneratedConfig, BlogPost } from '../lib/Types.ts';
-
-const readingTime = _readingTime as unknown as (text: string) => {
-  minutes: number;
-  time: number;
-  words: { total: number };
-};
 
 const getLastUpdateDate = (root: string, fileName: string) => {
   const timestamp = parseInteger(
@@ -52,10 +46,9 @@ export function readPosts({
       const { content, data } = matter(
         readFileSync(join(root, relativePath), 'utf8'),
       );
-      const {
-        minutes,
-        words: { total: words },
-      } = readingTime(content);
+      const wordCount = countWords(content);
+      const { total: words } = wordCount;
+      const { minutes } = readingTimeWithCount(wordCount);
 
       if (typeof data.title !== 'string' || !data.title) {
         throw new Error(`Post '${slug}' must define a title.`);

@@ -15,7 +15,7 @@ A Void-native blogging framework for MDX blogs.
 Install `void-blog` and the Void peers from npm:
 
 ```sh
-pnpm add void-blog @void/react@^0.7.1 void@^0.7.1
+pnpm add void-blog @void/react@^1.10.0 void@^1.10.0
 ```
 
 ## Configure
@@ -40,17 +40,17 @@ import tailwindcss from '@tailwindcss/vite';
 import { voidReact } from '@void/react/plugin';
 import { defineConfig } from 'vite-plus';
 import { voidPlugin } from 'void';
-import blogConfig from './blog.config.ts';
 import mdxOptions from 'void-blog/mdx';
 import { voidBlog } from 'void-blog/vite';
+import blogConfig from './blog.config.ts';
 
 export default defineConfig({
   plugins: [
     voidBlog(blogConfig),
-    ...voidPlugin(),
+    voidPlugin(),
     mdx(mdxOptions),
     ...tailwindcss(),
-    ...voidReact({ viewTransitions: true }),
+    voidReact({ viewTransitions: true }),
   ],
 });
 ```
